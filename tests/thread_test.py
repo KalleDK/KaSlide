@@ -1,17 +1,17 @@
-import threading
-import time
+from pathlib import Path
+from kaslide.projector.slide import SlideNormal
+
+event_path = Path('.', 'Slideshow', 'Events', 'Reklamer')
 
 
-def g(y, x):
-    print(y)
-    print(x)
+def create_event_slide(text, path: Path):
+    return SlideNormal(filename=path, text=text)
 
 
-def t(**kwargs):
-    print(kwargs)
-    g(**kwargs)
+def create_event_slides(path: Path):
+    name = path.name
+    return [SlideNormal(str(x), text=name) for x in path.iterdir() if x.is_file()]
 
-t(x=7, y=1)
+print(create_event_slides(event_path))
 
-t(y=7, x=2)
 
