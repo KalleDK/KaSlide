@@ -1,8 +1,10 @@
 import pyglet
 
-from .picture import PictureFitWindow
-from .label import LabelWithShadow
+from .picture import Picture
+from .label import Label
 from .window import Window
+
+from . import entity
 
 
 class Display(pyglet.event.EventDispatcher):
@@ -11,14 +13,17 @@ class Display(pyglet.event.EventDispatcher):
 
         self.window = Window(fullscreen=fullscreen, debug=debug)
 
-        self.label = LabelWithShadow(self.window.width, self.window.height)
+        self.label = Label(self.plane, "")
         self.window.register_figure(self.label)
 
-        self.picture = PictureFitWindow(self.window.width, self.window.height,
-                                        img=self.create_default_image())
+        self.picture = Picture(self.plane, img=self.create_default_image())
         self.window.register_figure(self.picture)
 
         self.window.push_handlers(on_close=self.close, on_key_press=self.key_press)
+
+    @property
+    def plane(self):
+        return entity.Plane(width=self.window.width, height=self.window.height)
 
     def create_default_image(self, color=(0, 0, 0, 0)):
         return pyglet.image.SolidColorImagePattern(color=color).create_image(self.window.width, self.window.height)

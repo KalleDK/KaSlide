@@ -1,4 +1,5 @@
 import pyglet
+from . import entity
 
 
 class Window(pyglet.event.EventDispatcher):
@@ -25,7 +26,7 @@ class Window(pyglet.event.EventDispatcher):
     def register_figure(self, figure):
         self.push_handlers(on_draw=figure.draw, on_resize=figure.resize)
 
-        figure.resize(self.width, self.height)
+        figure.resize(entity.Plane(self.width, self.height))
 
     def set_fullscreen(self, fullscreen):
         self._window.set_fullscreen(fullscreen=fullscreen)
@@ -45,7 +46,7 @@ class Window(pyglet.event.EventDispatcher):
         self.dispatch_event('on_draw')
 
     def resize(self, width, height):
-        self.dispatch_event('on_resize', width, height)
+        self.dispatch_event('on_resize', entity.Plane(width=width, height=height))
 
 Window.register_event_type('on_close')
 Window.register_event_type('on_draw')
