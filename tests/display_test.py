@@ -15,34 +15,35 @@ class CommercialSlide(kaslide.projector.SlideFromFile):
 
 def load_setting(path: Path):
     return {
-    'commercials': {
-        'path': Path(path, 'Slideshow', 'Reklamer'),
-        'timeout': 6,
-        'ratio': 7
-    },
-
-    'events': {
-        'path': Path(path, 'Slideshow', 'Events'),
-        'timeout': 1,
-        'group_size': 10
-    },
-
-    'suffixes': ['.png', '.jpg'],
-
-    'default': {
-        'text': '',
-        'image': {
-            'path': Path(path, 'default.png')
+        'commercials': {
+            'path': Path(path, 'Slideshow', 'Reklamer'),
+            'timeout': 6,
+            'ratio': 7
         },
-        'display': {
-            'width': 800,
-            'height': 600,
-            'fullscreen': False
-        }
-    },
 
-    'debug': True
-}
+        'events': {
+            'path': Path(path, 'Slideshow', 'Events'),
+            'timeout': 4,
+            'group_size': 10
+        },
+
+        'suffixes': ['.png', '.jpg'],
+
+        'default': {
+            'text': '',
+            'image': {
+                'path': Path(path, 'default.png')
+            },
+            'display': {
+                'width': 800,
+                'height': 600,
+                'fullscreen': False,
+                'resizable': True
+            }
+        },
+
+        'debug': False
+    }
 
 
 def choose_random_list(list_collection):
@@ -133,17 +134,16 @@ def create_projector_wheel(event_path, commercial_path, valid_suffixes, group_si
     slides = merge_slides(event_slides, commercial_slides, ratio)
 
     # Create the wheel
-    wheel = kaslide.projector.Wheel(slides)
+    wheel = kaslide.create_wheel(slides)
 
     return wheel
 
 
 def create_plane(width, height):
-    return kaslide.entity.Plane(width=width, height=height)
+    return kaslide.create_plane(width=width, height=height)
 
 
 def create_projector(settings):
-
     default_image = kaslide.graphic.Image(
         path=settings['default']['image']['path']
     )
@@ -165,6 +165,7 @@ def create_projector(settings):
         default_image=default_image,
         default_text=settings['default']['text'],
         fullscreen=settings['default']['display']['fullscreen'],
+        resizable=settings['default']['display']['resizable'],
         debug=settings['debug'],
         wheel=wheel,
         plane=plane
@@ -172,7 +173,6 @@ def create_projector(settings):
 
 
 class Slideshow:
-
     def __init__(self, settings):
         CommercialSlide.timeout = settings['commercials']['timeout']
         EventSlide.timeout = settings['events']['timeout']
@@ -183,5 +183,16 @@ class Slideshow:
         pyglet.app.run()
 
 
+def zoom_to_plane(sprite, plane):
+    scale = max(plane.width / sprite.image.width, plane.height / sprite.image.height)
+
+    x = (plane.width - (sprite.image.width * scale)) / 2
+    y = (plane.height - (sprite.image.height * scale)) / 2
+
+    sprite.update(x=x, y=y, scale=scale)
+    return True
+
+
 app = Slideshow(settings=load_setting(Path('.')))
+#app.projector.display._picture.push_handlers(on_sprite_resize=zoom_to_plane)
 app.start()
