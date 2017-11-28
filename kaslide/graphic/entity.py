@@ -14,3 +14,5 @@ class Entity:
     def resize(self, plane):
         pass
 
+
+

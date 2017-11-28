@@ -5,42 +5,56 @@ from .label import Label
 from .window import Window
 
 from . import entity
+from . import window
 
 
 class Display(pyglet.event.EventDispatcher):
-    def __init__(self, fullscreen=False, debug=False):
+
+    def __init__(self, default_image, default_text, plane, fullscreen=False, debug=False):
         super().__init__()
 
-        self.window = Window(fullscreen=fullscreen, debug=debug)
+        self._default_image = default_image
+        self._default_text = default_text
+        self._window = Window(width=plane.width, height=plane.height, fullscreen=fullscreen)
+        self._label = Label(plane=self.plane, text=self._default_text)
+        self._picture = Picture(plane=self.plane, img=self._default_image)
 
-        self.label = Label(self.plane, "")
-        self.window.register_figure(self.label)
+        window.register_entity(self._window, self._label)
+        window.register_entity(self._window, self._picture)
 
-        self.picture = Picture(self.plane, img=self.create_default_image())
-        self.window.register_figure(self.picture)
-
-        self.window.push_handlers(on_close=self.close, on_key_press=self.key_press)
+        self._window.push_handlers(on_close=self.on_window_close,
+                                   on_key_press=self.on_window_key_press,
+                                   on_draw=self.on_window_draw)
 
     @property
     def plane(self):
-        return entity.Plane(width=self.window.width, height=self.window.height)
-
-    def create_default_image(self, color=(0, 0, 0, 0)):
-        return pyglet.image.SolidColorImagePattern(color=color).create_image(self.window.width, self.window.height)
+        return entity.Plane(width=self._window.width, height=self._window.height)
 
     def set_label(self, text):
-        self.label.set_text(text)
+        self._label.set_text(text)
+
+    def remove_label(self):
+        self.set_label(self._default_text)
 
     def set_picture(self, img):
-        self.picture.set_image(img)
+        self._picture.set_image(img)
+
+    def remove_picture(self):
+        self.set_picture(self._default_image)
 
     def toggle_fullscreen(self):
-        self.window.toggle_fullscreen()
+        self._window.set_fullscreen(not self._window.fullscreen)
 
     def close(self):
+        self._window.close()
+
+    def on_window_draw(self):
+        self._window.clear()
+
+    def on_window_close(self):
         self.dispatch_event('on_close')
 
-    def key_press(self, symbol, modifiers):
+    def on_window_key_press(self, symbol, modifiers):
         self.dispatch_event('on_key_press', symbol, modifiers)
 
 

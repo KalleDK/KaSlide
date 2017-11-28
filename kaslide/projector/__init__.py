@@ -1,4 +1,5 @@
-from .wheel import SlideWheel
-from .slide import SlideNormal
-from .keypad import SlideShowKeyboard
-from .slideshow import SlideShow
+from .wheel import Wheel
+from .slide import SlideFromFile, Slide
+from .keyboard import Keyboard
+from .projector import Projector
+from .autopilot import AutoPilot

@@ -1,7 +1,4 @@
-class SlideImage:
-    def __init__(self, filename, fp=None):
-        self.filename = filename
-        self.fp = fp
+from .. import graphic
 
 
 class SlideText:
@@ -11,23 +8,26 @@ class SlideText:
     def __init__(self, text):
         self.text = text
 
+    def __str__(self):
+        return "SlideText(text=" + self.text + ")"
+
 
 class Slide:
 
     timeout = 0
 
-    def __init__(self, image: SlideImage, text: SlideText):
+    def __init__(self, image: graphic.Image, text: SlideText):
         self.image = image
         self.text = text
+
+    def __str__(self):
+        return "Slide(image=" + str(self.image) + ", text=" + str(self.text) + ")"
 
 #
 # Slide types
 #
 
 
-class SlideNormal(Slide):
-
-    timeout = 1
-
-    def __init__(self, filename, text):
-        super().__init__(SlideImage(filename), SlideText(text))
+class SlideFromFile(Slide):
+    def __init__(self, path, text):
+        super().__init__(graphic.Image(path=path), SlideText(text=text))
