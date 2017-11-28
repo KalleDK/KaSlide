@@ -55,12 +55,6 @@ def create_event_collection_slides(path: Path):
 
 
 slides = create_event_collection_slides(event_path)
-slides2 = [
-    SlideNormal("default.png", ""),
-    SlideNormal("test1.jpg", "Test1"),
-    SlideNormal("test2.jpg", "Test2"),
-    SlideNormal("test3.jpg", "Test3")
-]
 
 wheel = kaslide.projector.SlideWheel(slides)
 
